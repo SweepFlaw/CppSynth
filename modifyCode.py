@@ -24,7 +24,7 @@ def readTargetFile(targetFilename):
 import csv
 
 # input: vscmFilename(string)
-# output: list(dictionary)
+# output: vscm = list(dictionary)
 # -- dictionary layout
 #    - targetLine (int)
 #    - targetColumn (int)
@@ -57,7 +57,7 @@ def readVscm(vscmFilename, csvSeparator=','):
     return vscm
 
 
-# In[118]:
+# In[3]:
 
 
 # input: 
@@ -67,14 +67,16 @@ def readVscm(vscmFilename, csvSeparator=','):
 # output: multiple return values.
 #   - modified codeline String (string),
 #   - modified codeline Index, start from 0 (int),
-#   - returnStatus(int)
+#   - returnStatus(int) (0 for success, (-1) for failure)
+from copy import deepcopy
+
 def modCode(code, vscm, vscmIndex):
     if len(vscm) < vscmIndex:
         return (code, -1, -1)
     modSpec = vscm[vscmIndex]
     lineNo = modSpec['targetLine'] - 1
     colNo = modSpec['targetColumn'] - 1
-    mc = code[lineNo]
+    mc = deepcopy(code[lineNo])
     front = mc[:colNo]
     end = mc[colNo + modSpec['targetLength']:]
     mc = "".join([front, modSpec['candidateStr'], end])
@@ -82,7 +84,7 @@ def modCode(code, vscm, vscmIndex):
     
 
 
-# In[119]:
+# In[2]:
 
 
 # function modCodeFull (make this for main functionality)
@@ -93,13 +95,13 @@ def modCode(code, vscm, vscmIndex):
 # output: multiple return values.
 #   - modified whole source String (string)
 #   - modified codeline Index, start from 0 (int)
-#   - returnStatus(int)
+#   - returnStatus(int) (0 for success, (-1) for failure)
 def modCodeFull(code, vscm, vscmIndex):
     mc, mci, rs = modCode(code, vscm, vscmIndex)
-    if mci > 0:
-        codeFront = "".join(code[:(mci - 1)])
-    else:
-        codeFront = ""
+    if rs != 0:
+        return (code, (-1), (-1))
+        
+    codeFront = "".join(code[:mci])
     if mci + 1 < len(code):
         codeEnd = "".join(code[(mci + 1):])
     else:
@@ -137,14 +139,14 @@ if __name__ == '__main__':
 
 # ## TEST
 
-# In[137]:
+# In[139]:
 
 
 # TEST FLAG
 TEST_FLAG = False
 
 
-# In[138]:
+# In[140]:
 
 
 # run main function (code for jupyter interface)
@@ -173,21 +175,16 @@ if TEST_FLAG:
     #print(modedstr_test)
     
     # mainFunc test
-    print(mainFunc(tc_fn, vscm_fn, 1))
+    #print(mainFunc(tc_fn, vscm_fn, 1))
 
 
-# In[74]:
+# In[ ]:
 
 
-# test multiple return value.
-def aaa():
-    return 1, 2, 3
-
-a, b, c = aaa()
-print(a)
 
 
-# In[75]:
+
+# In[ ]:
 
 
 
