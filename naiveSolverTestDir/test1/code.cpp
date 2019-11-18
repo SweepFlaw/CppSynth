@@ -3,8 +3,8 @@
 using namespace std;
 
 int main(void){
-    int x, y;
-    cin >> x >> y;
-    cout << x+x << endl;
+    int w, x, y, z;
+    cin >> w >> x >> y >> z;
+    cout << w+x << endl;
     return 0;
 }
