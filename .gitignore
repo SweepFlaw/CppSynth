@@ -1,7 +1,7 @@
 pairData*
 *.vscm
 *.pyc
-
+jupyterLogs/*
 
 __pycache__/
 .ipynb_checkpoints/
