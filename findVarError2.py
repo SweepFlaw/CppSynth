@@ -91,11 +91,14 @@ def codeTest(code, tmpFilename, cFilename, inputTestcases, outputTestcases, sing
 #   - valid Iterate count (int)
 from itertools import combinations
 
-def findVarErr2(code, vscm, tmpFilename, cFilename, modNum, inputTestcases, outputTestcases, singleTestTimeout, totalTimeout=0, printDebugInfo=False):
-    if len(inputTestcases) < 1:
-        return ('', [], 3, [], 0)
-    
+def findVarErr2(code, vscm, tmpFilename, cFilename, modNum, inputTestcases, outputTestcases, singleTestTimeout, totalTimeout=0, printDebugInfo=True):
+    if printDebugInfo:
+        print('findVarErr2 : dbg: findVarErr2 START')
     startTime = time.time()
+    
+    if len(inputTestcases) < 1:
+        return ('', [], [], 3, [], (time.time() - startTime), 0)
+    
     timeout = startTime + totalTimeout
     validModificationCount = 0
     
@@ -104,16 +107,16 @@ def findVarErr2(code, vscm, tmpFilename, cFilename, modNum, inputTestcases, outp
     
     # debugging - print the length of vscm
     if printDebugInfo:
-        print('resultCode for each testcases (list(int)) (0 for success. 1 for W/A. 2 for timeout. 3 for other runtime errors. empty list means no testcases or compile error.)')
-        print('VSCM LENGTH : ' + str(len(vscm)))
+        print('findVarErr2 : dbg: VSCM Length: ', len(vscm))
     
     for mN in range(1, modNum + 1):
         # mT for modification-tuple
         # mL for modification-list
           
         #debugging - print current mN
-        print('< mN VALUE CHANGED >')
-        print('mN = ' + str(mN))
+        if printDebugInfo:
+            print('findVarErr2 : dbg: < SET mN VALUE >')
+            print('||  mN = ', mN)
           
         for mT in combinations(range(len(vscm)), mN):
             # timeout check
@@ -129,18 +132,13 @@ def findVarErr2(code, vscm, tmpFilename, cFilename, modNum, inputTestcases, outp
             #  test code with testcases
             trc, rcs = codeTest(mc, tmpFilename, cFilename, inputTestcases, outputTestcases, singleTestTimeout)
             
+            validModificationCount += 1
             # debugging - count the number of iteration
             if printDebugInfo:
-                print('===========================================')
-                validModificationCount += 1
-                print('validModificationCount   # ' + str(validModificationCount))
-                print('TEST RESULTS:' + str(rcs))
-                #print('MODIFIED SRC:')
-                #print(mc)
-                #print('')
-                print('ELAPSED TIME:' + str(time.time() - timeCache))
-                timeCache = time.time()
-                print('')
+                if validModificationCount % 50 == 1:
+                    print('findVarErr2 : dbg: validModificationCount = ', validModificationCount)
+                    print('||  ELAPSED TIME:' + str(time.time() - timeCache))
+                    timeCache = time.time()
             
             if trc == 0:
                 return (mc, mcis, list(mT), 0, rcs, (time.time() - startTime), validModificationCount)
@@ -174,7 +172,10 @@ import os
 from modifyCode import readVscm, modCodeFull
 from makeVscm import genVscm
 
-def naiveSolution2(testDir, codeDir, tmpDir, codefname, modNumLimit=2, singleTestTimeout=2, testcaseLimit=1000):
+def naiveSolution2(testDir, codeDir, tmpDir, codefname, modNumLimit=2, singleTestTimeout=2, testcaseLimit=1000, debugPrint=True):
+    if debugPrint:
+        print('naiveSolution2 : dbg: naiveSolution2 START')
+    
     # set filenames
     codeFilename = os.path.join(codeDir, codefname)
     vscmFilename = os.path.join(tmpDir, 'vscm.csv')
@@ -206,23 +207,28 @@ def naiveSolution2(testDir, codeDir, tmpDir, codefname, modNumLimit=2, singleTes
     
     # run!
     src, linNums, vscmIndices, rs, rcs, etime, vIterNum = findVarErr2(code, vscm, tmpFilename, cFilename, modNumLimit, inputTestcases, outputTestcases, singleTestTimeout)
-    print('')
-    print('====================================== RESULT')
-    print('====================================== RESULT')
-    print('====================================== RESULT')
-    print('====================================== SRC')
-    print(src)
-    print('====================================== RS')
-    print(rs)
-    print('====================================== Result code for each testcases')
-    print(rcs)
-    print('====================================== VSCM Indices')
-    print(vscmIndices)
-    print('====================================== modifiedLineNum')
-    print(linNums)
-    print('====================================== ELAPSED TIME')
-    print(etime)
-    print('')
+    if debugPrint:
+        print('naiveSolution2 : dbg: findVarErr2 FINISH')
+        print('||  Result Status Code : 0-success, 1-answerNotFound 2-totalTimeout 3-TCNotFound')
+        print('||  Result Status : ', rs)
+        print('||  Elapsed Time : ', etime)
+        print('||  Modified Line Numbers : ', linNums)
+        #print('====================================== RESULT')
+        #print('====================================== RESULT')
+        #print('====================================== RESULT')
+        #print('====================================== SRC')
+        #print(src)
+        #print('====================================== RS')
+        #print(rs)
+        #print('====================================== Result code for each testcases')
+        #print(rcs)
+        #print('====================================== VSCM Indices')
+        #print(vscmIndices)
+        #print('====================================== modifiedLineNum')
+        #print(linNums)
+        #print('====================================== ELAPSED TIME')
+        #print(etime)
+        #print('')
     return src, linNums, vscmIndices, rs, rcs, etime, vIterNum, len(vscm)
     
 
