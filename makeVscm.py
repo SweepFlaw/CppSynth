@@ -17,7 +17,7 @@ genVscmBinaryPath = '/home/ubuntu/workspace/VarSubsCandListGenCpp/bin/vscm'
 
 
 vscmMainOption=0
-vscmSelectCandOption=1
+vscmSelectCandOption=2
 
 
 # In[4]:

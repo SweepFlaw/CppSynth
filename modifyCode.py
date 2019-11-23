@@ -43,18 +43,20 @@ def readVscm(vscmFilename, csvSeparator=','):
     with open(vscmFilename, 'r') as csvfile:
         vscmReader = csv.reader(csvfile, delimiter=csvSeparator)
         for row in vscmReader:
-            r = {}
-            r['targetLine'] = int(row[0])
-            r['targetColumn'] = int(row[1])
-            r['targetOffset'] = int(row[2])
-            r['targetLength'] = int(row[3])
-            r['targetStr'] = row[4]
-            r['candidateLine'] = int(row[5])
-            r['candidateColumn'] = int(row[6])
-            r['candidateOffset'] = int(row[7])
-            r['candidateLength'] = int(row[8])
-            r['candidateStr'] = row[9]
-            vscm.append(r)
+            if (row[4] != 'operator>>' and row[4] != 'operator<<'
+               and row[9] != 'operator>>' and row[9] != 'operator<<'):
+                r = {}
+                r['targetLine'] = int(row[0])
+                r['targetColumn'] = int(row[1])
+                r['targetOffset'] = int(row[2])
+                r['targetLength'] = int(row[3])
+                r['targetStr'] = row[4]
+                r['candidateLine'] = int(row[5])
+                r['candidateColumn'] = int(row[6])
+                r['candidateOffset'] = int(row[7])
+                r['candidateLength'] = int(row[8])
+                r['candidateStr'] = row[9]
+                vscm.append(r)
     return vscm
 
 
