@@ -1,6 +1,9 @@
 from setting import *
 import subprocess
 
+# return two values
+# 1. sorted vscm
+# 2. the number of line-column pair from POSLEARN_APPFILE's output.
 def applyRNNResult(vscm, codeFilename, debugPrint=True):
     pr = subprocess.Popen(['python', POSLEARN_APPFILE, codeFilename], cwd=POSLEARN_PROJ_DIR, stdout=subprocess.PIPE)
     pr_out, pr_err = pr.communicate()
@@ -17,4 +20,4 @@ def applyRNNResult(vscm, codeFilename, debugPrint=True):
         vscm_tmp.append((x, score))
     if debugPrint:
         print('modifyVscm : dbg: # of recommendation = ', len(rnnResult))
-    return [ x[0] for x in sorted(vscm_tmp, key=lambda x: x[1]) ]
+    return [ x[0] for x in sorted(vscm_tmp, key=lambda x: x[1]) ], len(rnnResult)

@@ -30,9 +30,10 @@ def findTC(contestStr, questionStr):
 # - running time, integer(second)
 # - human solving time, integer(second)
 # - running iteration count, integer
+# - vscm Modifier's recommendation length, integer
 
 def modifyOne(wacodeFname, okcodeFname, inputTCDir, outputTCDir):
-    modified_src, modified_linNums, used_vscmIndices, return_status, result_codes, elapsed_time, valid_moditer_count, vscm_length = makeSolution(
+    modified_src, modified_linNums, used_vscmIndices, return_status, result_codes, elapsed_time, valid_moditer_count, recommendation_length, vscm_length = makeSolution(
         wacodeFname,
         inputTCDir,
         outputTCDir
@@ -49,7 +50,7 @@ def modifyOne(wacodeFname, okcodeFname, inputTCDir, outputTCDir):
     okcodeTime = int(okcodeFnameBase[:(-6)])
     human_solving_time = okcodeTime - wacodeTime
     
-    return return_status, wa_src, modified_src, ok_src, vscm_length, used_vscmIndices, modified_linNums, elapsed_time, human_solving_time, valid_moditer_count
+    return return_status, wa_src, modified_src, ok_src, vscm_length, used_vscmIndices, modified_linNums, elapsed_time, human_solving_time, valid_moditer_count, recommendation_length
 
 
 
@@ -78,6 +79,7 @@ def runAll():
     summary_running_time = []
     summary_vscm_length = []
     summary_valid_moditer_count = []
+    summary_recommendation_length = []
     
     runningStatusCount = 0
     startTime = time.time()
@@ -102,7 +104,7 @@ def runAll():
         if ftc_rc == 0:
             if DEBUG_PRINT:
                 print('runAll : dbg: this W/A code has testcases.')
-            return_status, wrong_src, modified_src, ok_src, vscm_length, used_vscmIndices, modified_linNums, running_time, human_solving_time, valid_moditer_count = modifyOne(
+            return_status, wrong_src, modified_src, ok_src, vscm_length, used_vscmIndices, modified_linNums, running_time, human_solving_time, valid_moditer_count, recommendation_length = modifyOne(
                 wafn,
                 okfn,
                 os.path.join(qtc_path, 'input'),
@@ -124,7 +126,8 @@ def runAll():
         with open(fname_full, 'w') as logfile:
             logfile.write('1. contest_str\t2. question_str\t3. wa_fn\t4. ok_fn\n')
             logfile.write('5. return_status\t6. vscm_length\t7. modified_linNums\t8. running_time\n')
-            logfile.write('9. human_solving_time\t10. valid_moditer_count\t11~13: wa, modified, ok src\n')
+            logfile.write('9. human_solving_time\t10. valid_moditer_count\t11. recommendation_length\n')
+            logfile.write('12~14: wa, modified, ok src\n')
             logfile.write(contest_str + '\n')
             logfile.write(question_str + '\n')
             logfile.write(wa_fn + '\n')
@@ -135,6 +138,7 @@ def runAll():
             logfile.write(str(running_time) + '\n')
             logfile.write(str(human_solving_time) + '\n')
             logfile.write(str(valid_moditer_count) + '\n')
+            logfile.write(str(recommendation_length) + '\n')
             logfile.write('\n' + wrong_src + '\n')
             logfile.write('\n' + modified_src + '\n')
             logfile.write('\n' + ok_src + '\n')
@@ -145,6 +149,7 @@ def runAll():
         summary_running_time.append(running_time)
         summary_vscm_length.append(vscm_length)
         summary_valid_moditer_count.append(valid_moditer_count)
+        summary_recommendation_length.append(recommendation_length)
         
     # write summary
     if DEBUG_PRINT:
@@ -154,6 +159,7 @@ def runAll():
     rt_sum = 0
     vl_sum = 0
     vmc_sum = 0
+    rl_sum = 0
     refined_summary_human_solving_time = [(HUMANTIME_UPPER_LIMIT if x > HUMANTIME_UPPER_LIMIT else x) for x in summary_human_solving_time]
     for i, c in enumerate(summary_return_status):
         if c == 0:
@@ -162,6 +168,7 @@ def runAll():
             rt_sum += summary_running_time[i]
             vl_sum += summary_vscm_length[i]
             vmc_sum += summary_valid_moditer_count[i]
+            rl_sum += summary_recommendation_length[i]
     
     with open(SUMMARY_LOGFILENAME, 'w') as logfile:
         logfile.write('<<<SUMMARY LOG>>>\n')
@@ -172,6 +179,7 @@ def runAll():
             logfile.write('running_time_avg: ' + str(rt_sum / rs_0_count) + '\n')
             logfile.write('vscm_length_avg: ' + str(vl_sum / rs_0_count) + '\n')
             logfile.write('iterCount_avg: ' + str(vmc_sum / rs_0_count) + '\n')
+            logfile.write('recommendation_length: ' + str(rl_sum / rs_0_count) + '\n')
         else:
             logfile.write('returnStatus_0_count is ZERO\n')
         
@@ -181,6 +189,7 @@ def runAll():
         logfile.write('running_time_sum: ' + str(sum(summary_running_time)) + '\n')
         logfile.write('vscm_length_sum: ' + str(sum(summary_vscm_length)) + '\n')
         logfile.write('iterCount_sum: ' + str(sum(summary_valid_moditer_count)) + '\n')
+        logfile.write('recommendation_length_sum: ' + str(sum(summary_recommendation_length)) + '\n')
         
         logfile.write('\n<<<DETAIL LOG>>>\n')
         logfile.write('\nLOG_FILE_NAMES\n')
@@ -195,6 +204,8 @@ def runAll():
         logfile.write(str(summary_vscm_length))
         logfile.write('\nVALID_MODITER_COUNT\n')
         logfile.write(str(summary_valid_moditer_count))
+        logfile.write('\nRECOMMENDATION_LENGTH\n')
+        logfile.write(str(summary_recommendation_length))
         logfile.write('\n')
     
     if DEBUG_PRINT:

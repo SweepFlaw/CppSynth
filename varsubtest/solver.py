@@ -26,8 +26,12 @@ def readTC(inputTCDir, outputTCDir):
 
 # outputs: multiple values.
 # - multiple values returned from findVarErr2 function.
+# - (-2)th return value: VSCM Modifier's recommendation list length (integer)
 # - (-1)th return value: the length of vscm (integer)
 def makeSolution(codeFilename, inputTCDir, outputTCDir):
+    
+    # set default return value
+    recNum = 0
     
     # make code string list
     with open(codeFilename, 'r') as codefile:
@@ -58,11 +62,11 @@ def makeSolution(codeFilename, inputTCDir, outputTCDir):
             print('||  Result Status : ', 4)
             print('||  This Wrong-Answer code passes all Testcases')
             sys.stdout.flush()
-            return (mergedCode, [], [], 4, rc, 0, 0, len(vscm))
+            return (mergedCode, [], [], 4, rc, 0, 0, recNum, len(vscm))
     
     # modify vscm using position-learning
     if POSLEARN_APPLY:
-        vscm = applyRNNResult(vscm, codeFilename, DEBUG_PRINT)
+        vscm, recNum = applyRNNResult(vscm, codeFilename, DEBUG_PRINT)
     
     # run!
     src, linNums, vscmIndices, rs, rcs, etime, vIterNum = findVarErr2(code, vscm, MODIFIEDSRC_FILENAME, COMPILED_FILENAME, MOD_LIMIT, inputTestcases, outputTestcases, SINGLE_TIMEOUT, TOTAL_TIMEOUT)
@@ -89,4 +93,4 @@ def makeSolution(codeFilename, inputTCDir, outputTCDir):
         #print('====================================== ELAPSED TIME')
         #print(etime)
         #print('')
-    return src, linNums, vscmIndices, rs, rcs, etime, vIterNum, len(vscm)
+    return src, linNums, vscmIndices, rs, rcs, etime, vIterNum, recNum, len(vscm)
