@@ -4,11 +4,11 @@ import subprocess
 # return two values
 # 1. sorted vscm
 # 2. the number of line-column pair from POSLEARN_APPFILE's output.
-def applyRNNResult(vscm, codeFilename, debugPrint=True):
-    pr = subprocess.Popen(['python', POSLEARN_APPFILE, codeFilename], cwd=POSLEARN_PROJ_DIR, stdout=subprocess.PIPE)
+def applyNNResult(vscm, codeFilename, debugPrint=True):
+    pr = subprocess.Popen(['python', POSLEARN_APPFILE, codeFilename, POSLEARN_MODE], cwd=POSLEARN_PROJ_DIR, stdout=subprocess.PIPE)
     pr_out, pr_err = pr.communicate()
     pr_out = pr_out.decode("utf-8") 
-    rnnResult = [x.split(',') for x in pr_out.split('\n')[1:-1]]
+    rnnResult = list(set([x.split(',') for x in pr_out.split('\n')[1:-1]]))
     scoreDict = {}
     for i, c in enumerate(rnnResult):
         lin = int(c[0])

@@ -3,7 +3,7 @@ import os
 from setting import *
 from modifyCode import readVscm, modCodesFull
 from makeVscm import genVscm
-from modifyVscm import applyRNNResult
+from modifyVscm import applyNNResult
 from findVarError2 import codeTest, findVarErr2
 
 
@@ -66,7 +66,7 @@ def makeSolution(codeFilename, inputTCDir, outputTCDir):
     
     # modify vscm using position-learning
     if POSLEARN_APPLY:
-        vscm, recNum = applyRNNResult(vscm, codeFilename, DEBUG_PRINT)
+        vscm, recNum = applyNNResult(vscm, codeFilename, DEBUG_PRINT)
     
     # run!
     src, linNums, vscmIndices, rs, rcs, etime, vIterNum = findVarErr2(code, vscm, MODIFIEDSRC_FILENAME, COMPILED_FILENAME, MOD_LIMIT, inputTestcases, outputTestcases, SINGLE_TIMEOUT, TOTAL_TIMEOUT)
